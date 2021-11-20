@@ -1,3 +1,4 @@
+import java.sql.Connection;
 import java.util.ArrayList;
 
 public class Coche {
@@ -37,6 +38,24 @@ public class Coche {
     }
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+    public void insertar(Conectar conectar, Connection con) {
+        String campos = "";
+        String values = "";
+        if (!descripcion.isEmpty()) {
+            campos += "descripcion, ";
+            values += "\"" + this.getDescripcion() + "\", ";
+        }
+        if (precio != -1) {
+            campos += "precio, ";
+            values += this.getPrecio() + ", ";
+        }
+        if (!color.isEmpty()){
+            campos += "color, ";
+            values += "\"" + this.getColor() + "\", ";
+        }
+        String sql = "insert into coches (matricula, " + campos + "activo) values (\"" + this.getMatricula() + "\", " + values + this.isActivo() + ")";
+        System.out.println(sql);
     }
 }
 

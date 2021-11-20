@@ -49,6 +49,7 @@ public class Empleado {
             ResultSet rs = ps.executeQuery(sql);
 
             while (rs.next()) {
+                System.out.println(rs.getString(1));
                 this.setDni(rs.getString(1));
                 this.setIdCategoria(rs.getInt(2));
                 this.setNombre(rs.getString(3));
@@ -57,6 +58,8 @@ public class Empleado {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
         }
     } 
 }
