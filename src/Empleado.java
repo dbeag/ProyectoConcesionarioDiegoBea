@@ -94,5 +94,27 @@ public class Empleado {
         String sql = "insert into empleado (dni, " + campos + "activo) values (\"" + this.getDni() + "\", " + values + this.isActivo() + ")";
         conectar.ejecutarSql(con, sql);
         System.out.println("Empleado creado correctamente");
-    } 
+    }
+
+    public void actualizar(Connection con, Conectar conectar) {
+        String sql = "update empleado set ";
+        if (this.getNombre() != null) {
+            sql += "nombre = \"" + this.getNombre() + "\", ";
+        }
+        if (this.getApellidos() != null) {
+            sql += "apellidos = \"" + this.getApellidos() + "\", ";
+        }
+        if (this.getIdCategoria() != -1) {
+            sql += "idCategoria = " + this.getIdCategoria() + ", ";
+        }
+        if (this.getTelefono() != -1) {
+            sql += "telefono = " + this.getTelefono();
+        } else{
+            // Quitar ", "
+            sql = sql.substring(0, sql.length() - 2);
+        }
+        sql += " where dni like \"" + this.getDni() + "\"";
+        conectar.ejecutarSql(con, sql);
+        System.out.println("Empleado actualizado");
+    }
 }

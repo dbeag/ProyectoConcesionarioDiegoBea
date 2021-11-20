@@ -194,4 +194,9 @@ public class Conectar {
             //TODO: handle exception
         }
     }
+
+    public void insertarCategoria(Connection con, String nombre, int salario) {
+        String sql = "insert into categoria (nombreCategoria, salario) values (\"" + nombre + "\", " + salario + ")";
+        ejecutarSql(con, sql);
+    }
 }

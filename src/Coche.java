@@ -90,6 +90,25 @@ public class Coche {
         }
         return lstModificaciones;
     }
+
+    public void actualizar(Connection con, Conectar conectar) {
+        String sql = "update coches set ";
+        if (this.getDescripcion() != null) {
+            sql += "descripcion = \"" + this.getDescripcion() + "\", ";
+        }
+        if (this.getColor() != null) {
+            sql += "color = \"" + this.getColor() + "\", ";
+        }
+        if (this.getPrecio() != -1) {
+            sql += "precio = " + this.getPrecio();
+        } else{
+            // Quitar ", "
+            sql = sql.substring(0, sql.length() - 2);
+        }
+        sql += " where matricula like \"" + this.getMatricula() + "\"";
+        conectar.ejecutarSql(con, sql);
+        System.out.println("Coche actualizado");
+    }
 }
 
 /*class Modificaciones{

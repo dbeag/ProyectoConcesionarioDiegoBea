@@ -62,21 +62,21 @@ public class Cliente {
     }
 
     public void actualizar(Connection con, Conectar conectar) {
-        String sql = "update cliente ";
+        String sql = "update cliente set ";
         if (this.getNombre() != null) {
-            sql += "set nombre = \"" + this.getNombre() + "\", ";
+            sql += "nombre = \"" + this.getNombre() + "\", ";
         }
         if (this.getApellidos() != null) {
-            sql += "set apellidos = \"" + this.getApellidos() + "\", ";
+            sql += "apellidos = \"" + this.getApellidos() + "\", ";
         }
         if (this.getTelefono() != -1) {
-            sql += "set telefono = " + this.getTelefono();
+            sql += "telefono = " + this.getTelefono();
         } else{
             // Quitar ", "
-            System.out.println(sql + " " + sql.length());
-            sql = sql.substring(0, sql.length() - 1);
+            sql = sql.substring(0, sql.length() - 2);
         }
-        sql += "where dni like \"" + this.getDni() + "\"";
-        System.out.println(sql);
+        sql += " where dni like \"" + this.getDni() + "\"";
+        conectar.ejecutarSql(con, sql);
+        System.out.println("Cliente actualizado");
     }
 }

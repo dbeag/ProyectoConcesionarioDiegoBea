@@ -12,19 +12,22 @@ public class Program {
     public static final String MENUINICIO = "1. Iniciar sesión " + "\n0. Salir\n";
     public static final String MENUADMINISTRADOR = "1. Crear \"Modificaciones\""
             + "\n2. Añadir \"Precio\" a \"Modificaciones\"" + "\n3. Añadir registros" + "\n4. Modificar registros"
-            + "\n5. Borrar registros" + "\n6. Consultar tablas" + "\n7. Ejecutar venta"
-            + "\n8. Actualizar precio coches" + "\n0. Salir";
-    public static final String MENUVENDEDOR = "1. Establecer venta" + "\n2. Modificar venta"
-            + "\n3. Añadir nuevo cliente" + "\n4. Modificar cliente" + "\n5. Borrar cliente" + "\n6. Añadir nuevo coche"
-            + "\n7. Modificar coche" + "\n8. Añadir modificaciones" + "\n9. Cambiar modificaciones"
-            + "\n10. Eliminar modificaciones" + "\n0. Salir";
-    public static final String MENUGERENTE = "1. Añadir empleado" + "\n2. Modificar empleado" + "\n3. Eliminar empleado"
-            + "\n4. Listar ventas";
-
+            + "\n0. Salir";
+    // Procedimiento: Establecer como inactivos los coches que se vendan
+    public static final String MENUVENDEDOR = "1. Establecer venta" + "\n2. Añadir nuevo cliente"
+            + "\n3. Modificar cliente" + "\n4. Borrar cliente" + "\n5. Añadir nuevo coche" + "\n6. Modificar coche"
+            + "\n7. Añadir modificaciones" + "\n8. Cambiar modificaciones" + "\n9. Eliminar modificaciones"
+            + "\n0. Salir";
+    /*
+     * public static final String MENUGERENTE = "1. Añadir empleado" +
+     * "\n2. Modificar empleado" + "\n3. Eliminar empleado" + "\n4. Listar ventas";
+     */
+    // TODO: Normalizar dni y nums negativos
     public static ArrayList<Empleado> lstEmpleados;
     public static ArrayList<Coche> lstCoches;
     public static ArrayList<Cliente> lstClientes;
     public static ArrayList<String> lstTablas;
+    public static Empleado empleadoActual;
     // DNI admin: 18324862J
     // DNI vendedor: 18359781N
 
@@ -38,15 +41,15 @@ public class Program {
             sc.close();
             return;
         }
-        Empleado empleado = menuInicioSesion(sc, con);
-        if (empleado == null) {
+        empleadoActual = menuInicioSesion(sc, con);
+        if (empleadoActual == null) {
             cerrarConexion(con);
             sc.close();
             return;
         }
-        if (empleado.getIdCategoria() == 1) {
+        if (empleadoActual.getIdCategoria() == 1) {
             menuAdministrador(sc, con, conectar);
-        } else if (empleado.getIdCategoria() == 3) {
+        } else if (empleadoActual.getIdCategoria() == 3) {
             // TODO: Menu gerente
         } else {
             // TODO: Menu empleado
@@ -89,27 +92,131 @@ public class Program {
 
     private static void menuModificar(Conectar conectar, Connection con, Scanner sc) {
         ArrayList<String> lst = conectar.obtenerTablas(con);
+        boolean modificacionesExist = false;
         for (String tabla : lst) {
-            if (!tabla.equals("venta") || !tabla.equals("categoria")) {
+            if (!tabla.equals("venta") && !tabla.equals("modificaciones") && !tabla.equals("categoria")) {
                 System.out.println(tabla);
+            }
+            if (tabla.equals("modificaciones")) {
+                modificacionesExist = true;
             }
         }
         System.out.println("Introduce la tabla que deseas modificar (omita para cancelar)");
         sc.nextLine();
         String tablaModificar = sc.nextLine().toLowerCase().trim();
         switch (tablaModificar) {
-            case "coches":
-                //modificarCoches();
-                break;
-            case "cliente":
-                modificarCliente(sc, con, conectar);
-                break;
-            case "":
-                System.out.println("Operación cancelada");
-                break;
-            default:
-                System.out.println("Tabla no encontrada");
-                break;
+        case "coches":
+            modificarCoches(sc, con, conectar);
+            break;
+        case "cliente":
+            modificarCliente(sc, con, conectar);
+            break;
+        case "empleado":
+            modificarEmpleado(sc, con, conectar);
+            break;
+        case "":
+            System.out.println("Operación cancelada");
+            break;
+        default:
+            System.out.println("Tabla no encontrada");
+            break;
+        }
+    }
+
+    private static void modificarEmpleado(Scanner sc, Connection con, Conectar conectar) {
+        System.out.println("Modificando tabla empleado");
+        System.out.print("Introduce el dni del empleado: ");
+        boolean modificado = false;
+        String dni = sc.nextLine().trim();
+        Empleado empleado = null;
+        for (Empleado fcliente : lstEmpleados) {
+            if (fcliente.getDni().equals(dni)) {
+                empleado = fcliente;
+            }
+        }
+        if (empleado != null) {
+            System.out.println("Modificando empleado: " + empleado.getNombre());
+            System.out.print("Introduzca el nuevo nombre (omita para cancelar): ");
+            String nombre = sc.nextLine();
+            if (!nombre.isEmpty()) {
+                empleado.setNombre(nombre);
+                modificado = true;
+            } else {
+                empleado.setNombre(null);
+            }
+            int categoria = -1;
+            if (!empleado.getDni().equals(empleadoActual.getDni())) {
+                conectar.mostrarTablaCategoria(con);
+                categoria = pedirInt(sc, "Introduzca la categoria: ", false);
+                sc.nextLine();
+            }
+            empleado.setIdCategoria(categoria);
+            System.out.print("Introduzca los nuevos apellidos (omita para cancelar): ");
+            String apellidos = sc.nextLine();
+            if (!apellidos.isEmpty()) {
+                empleado.setApellidos(apellidos);
+                modificado = true;
+            } else {
+                empleado.setApellidos(null);
+            }
+            int telefono = pedirInt(sc, "Introduzca el nuevo teléfono (omita para cancelar): ", true);
+            if (telefono != -1) {
+                empleado.setTelefono(telefono);
+                modificado = true;
+            } else {
+                empleado.setTelefono(-1);
+            }
+            if (modificado) {
+                empleado.actualizar(con, conectar);
+                actualizarListas(conectar, con);
+            } else {
+                System.out.println("No se ha modificado a " + empleado.getNombre());
+            }
+        } else {
+            System.out.println("No se ha encontrado el empleado indicado");
+        }
+    }
+
+    private static void modificarCoches(Scanner sc, Connection con, Conectar conectar) {
+        System.out.println("Modificando tabla coches");
+        System.out.println("Introduce la matrícula del coche");
+        boolean modificado = false;
+        String matricula = sc.nextLine().trim();
+        Coche coche = null;
+        for (Coche fcoche : lstCoches) {
+            if (fcoche.getMatricula().equals(matricula)) {
+                coche = fcoche;
+            }
+        }
+        if (coche != null) {
+            System.out.println("Modificando coche: " + coche.getDescripcion());
+            System.out.print("Introduzca la nueva descripcion (omita para cancelar): ");
+            String descripcion = sc.nextLine();
+            if (!descripcion.isEmpty()) {
+                coche.setDescripcion(descripcion);
+                modificado = true;
+            }
+            System.out.print("Introduzca el nuevo color (omita para cancelar): ");
+            String color = sc.nextLine();
+            if (!color.isEmpty()) {
+                coche.setColor(color);
+                modificado = true;
+            }
+            double precio = pedirDouble(sc, "Introduce el nuevo precio (omita para cancelar): ", true);
+            if (precio != -1) {
+                coche.setPrecio(precio);
+                modificado = true;
+            } else {
+                coche.setPrecio(-1);
+            }
+            if (modificado) {
+                coche.actualizar(con, conectar);
+                actualizarListas(conectar, con);
+            } else {
+                System.out.println("No se ha modificado");
+            }
+        } else {
+            System.out.println("No se ha encontrado el coche");
         }
     }
 
@@ -117,7 +224,7 @@ public class Program {
         System.out.println("Modificando tabla cliente");
         System.out.print("Introduce el dni del cliente: ");
         boolean modificado = false;
-        String dni = sc.nextLine();
+        String dni = sc.nextLine().trim();
         Cliente cliente = null;
         for (Cliente fcliente : lstClientes) {
             if (fcliente.getDni().equals(dni)) {
@@ -126,7 +233,7 @@ public class Program {
         }
         if (cliente != null) {
             System.out.println("Modificando cliente: " + cliente.getNombre());
-            System.out.println("Introduzca el nuevo nombre (omita para cancelar): ");
+            System.out.print("Introduzca el nuevo nombre (omita para cancelar): ");
             String nombre = sc.nextLine();
             if (!nombre.isEmpty()) {
                 cliente.setNombre(nombre);
@@ -134,7 +241,7 @@ public class Program {
             } else {
                 cliente.setNombre(null);
             }
-            System.out.println("Introduzca los nuevos apellidos (omita para cancelar): ");
+            System.out.print("Introduzca los nuevos apellidos (omita para cancelar): ");
             String apellidos = sc.nextLine();
             if (!apellidos.isEmpty()) {
                 cliente.setApellidos(apellidos);
@@ -163,8 +270,8 @@ public class Program {
     private static void menuInsertar(Conectar conectar, Connection con, Scanner sc) {
         int option = -1;
         while (option != 0) {
-            option = pedirInt(sc,
-                    "Elige una opción: " + "\n1. Agregar coche" + "\n2. Agregar cliente" + "\n0. Volver\n", false);
+            option = pedirInt(sc, "Elige una opción: " + "\n1. Agregar coche" + "\n2. Agregar cliente"
+                    + "\n3. Agregar categoria" + "\n0. Volver\n", false);
             sc.nextLine();
             switch (option) {
             case 1:
@@ -176,6 +283,18 @@ public class Program {
                 Cliente cliente = insertarDatosCliente(sc);
                 cliente.insertar(conectar, con);
                 lstClientes.add(cliente);
+                break;
+            case 3:
+                String nombre = "";
+                while (nombre.isEmpty()) {
+                    System.out.println("Introduce el nombre de la categoría: ");
+                    nombre = sc.nextLine().trim();
+                    if (nombre.isEmpty()) {
+                        System.out.println("Debes introducir la categoria: ");
+                    }
+                }
+                int salario = pedirInt(sc, "Introduce el salario: ", false);
+                conectar.insertarCategoria(con, nombre, salario);
                 break;
             /*
              * case 3: Empleado empleado = insertarDatosEmpleado(sc, conectar, con);
