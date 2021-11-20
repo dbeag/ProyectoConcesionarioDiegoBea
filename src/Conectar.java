@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 public class Conectar {
     public Connection conectar(String port) throws SQLException {
-        String basedatos = "bd_2_bea_d";
+        String basedatos = "proyecto_coches";
         String host = "servidorifc.iesch.org";
         // String port = "3306";
         // String port = "8882";
