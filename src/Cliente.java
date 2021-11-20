@@ -58,7 +58,25 @@ public class Cliente {
         }
         String sql = "insert into cliente (dni, " + campos + "activo) values (\"" + this.getDni() + "\", " + values + this.isActivo() + ")";
         conectar.ejecutarSql(con, sql);
-        System.out.println(sql);
         System.out.println("Cliente creado correctamente");
+    }
+
+    public void actualizar(Connection con, Conectar conectar) {
+        String sql = "update cliente ";
+        if (this.getNombre() != null) {
+            sql += "set nombre = \"" + this.getNombre() + "\", ";
+        }
+        if (this.getApellidos() != null) {
+            sql += "set apellidos = \"" + this.getApellidos() + "\", ";
+        }
+        if (this.getTelefono() != -1) {
+            sql += "set telefono = " + this.getTelefono();
+        } else{
+            // Quitar ", "
+            System.out.println(sql + " " + sql.length());
+            sql = sql.substring(0, sql.length() - 1);
+        }
+        sql += "where dni like \"" + this.getDni() + "\"";
+        System.out.println(sql);
     }
 }

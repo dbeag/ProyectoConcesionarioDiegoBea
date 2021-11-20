@@ -32,10 +32,7 @@ public class Program {
         Scanner sc = new Scanner(System.in);
         Conectar conectar = new Conectar();
         Connection con = establecerConexion(conectar);
-        lstEmpleados = conectar.obtenerEmpleados(con);
-        lstCoches = conectar.obtenerCoches(con);
-        lstClientes = conectar.obtenerClientes(con);
-        lstTablas = conectar.obtenerTablas(con);
+        actualizarListas(conectar, con);
         if (con == null) {
             cerrarConexion(con);
             sc.close();
@@ -55,6 +52,13 @@ public class Program {
             // TODO: Menu empleado
         }
         sc.close();
+    }
+
+    private static void actualizarListas(Conectar conectar, Connection con) {
+        lstEmpleados = conectar.obtenerEmpleados(con);
+        lstCoches = conectar.obtenerCoches(con);
+        lstClientes = conectar.obtenerClientes(con);
+        lstTablas = conectar.obtenerTablas(con);
     }
 
     private static void menuAdministrador(Scanner sc, Connection con, Conectar conectar) {
@@ -112,10 +116,10 @@ public class Program {
     private static void modificarCliente(Scanner sc, Connection con, Conectar conectar) {
         System.out.println("Modificando tabla cliente");
         System.out.print("Introduce el dni del cliente: ");
+        boolean modificado = false;
         String dni = sc.nextLine();
         Cliente cliente = null;
         for (Cliente fcliente : lstClientes) {
-            System.out.println(fcliente.getDni());
             if (fcliente.getDni().equals(dni)) {
                 cliente = fcliente;
             }
@@ -123,8 +127,34 @@ public class Program {
         if (cliente != null) {
             System.out.println("Modificando cliente: " + cliente.getNombre());
             System.out.println("Introduzca el nuevo nombre (omita para cancelar): ");
-            System.out.println("Introduzca el nuevo nombre (omita para cancelar): ");
-            System.out.println("Introduzca el nuevo nombre (omita para cancelar): ");
+            String nombre = sc.nextLine();
+            if (!nombre.isEmpty()) {
+                cliente.setNombre(nombre);
+                modificado = true;
+            } else {
+                cliente.setNombre(null);
+            }
+            System.out.println("Introduzca los nuevos apellidos (omita para cancelar): ");
+            String apellidos = sc.nextLine();
+            if (!apellidos.isEmpty()) {
+                cliente.setApellidos(apellidos);
+                modificado = true;
+            } else {
+                cliente.setApellidos(null);
+            }
+            int telefono = pedirInt(sc, "Introduzca el nuevo teléfono (omita para cancelar): ", true);
+            if (telefono != -1) {
+                cliente.setTelefono(telefono);
+                modificado = true;
+            } else {
+                cliente.setTelefono(-1);
+            }
+            if (modificado) {
+                cliente.actualizar(con, conectar);
+                actualizarListas(conectar, con);
+            } else {
+                System.out.println("No se ha modificado a " + cliente.getNombre());
+            }
         } else {
             System.out.println("No se ha encontrado el cliente indicado");
         }
