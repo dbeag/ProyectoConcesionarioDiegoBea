@@ -1,10 +1,14 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Conectar {
+
     public Connection conectar(String port) throws SQLException {
         String basedatos = "proyecto_coches";
         String host = "servidorifc.iesch.org";
@@ -28,6 +32,89 @@ public class Conectar {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
         }
+    }
+
+    public ArrayList<Empleado> obtenerEmpleados(Connection con) {
+        ArrayList<Empleado> lstEmpleado = new ArrayList<>();
+        String sql;
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            sql = "SELECT * FROM empleado where activo = true";
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                Empleado empleado = new Empleado();
+                empleado.setDni(rs.getString(1));
+                empleado.setIdCategoria(rs.getInt(2));
+                empleado.setNombre(rs.getString(3));
+                empleado.setApellidos(rs.getString(4));
+                empleado.setTelefono(rs.getInt(5));
+                empleado.setActivo(rs.getBoolean(6));
+                lstEmpleado.add(empleado);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return lstEmpleado;
+    }
+
+    public ArrayList<Cliente> obtenerClientes(Connection con) {
+        ArrayList<Cliente> lstCliente = new ArrayList<>();
+        String sql;
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            sql = "SELECT * FROM cliente where activo = true";
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setDni(rs.getString(1));
+                cliente.setNombre(rs.getString(2));
+                cliente.setApellidos(rs.getString(3));
+                cliente.setTelefono(rs.getInt(4));
+                cliente.setActivo(rs.getBoolean(5));
+                lstCliente.add(cliente);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return lstCliente;
+    }
+
+    public ArrayList<Coche> obtenerCoches(Connection con) {
+        ArrayList<Coche> lstCoche = new ArrayList<>();
+        String sql;
+        Statement ps;
+        ArrayList<String> lstTablas = obtenerTablas(con);
+        try {
+            ps = con.createStatement();
+            sql = "SELECT * FROM coches where activo = true";
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                Coche coche = new Coche();
+                coche.setMatricula(rs.getString(1));
+                coche.setDescripcion(rs.getString(2));
+                coche.setColor(rs.getString(3));
+                coche.setPrecio(rs.getDouble(4));
+                coche.setActivo(rs.getBoolean(5));
+                if (lstTablas.contains("modificaciones")) {
+                    coche.setLstModificaciones(coche.obtenerModificaciones(con));
+                }
+                lstCoche.add(coche);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return lstCoche;
     }
 
     public void crearTablaModificaciones(Connection con) {
@@ -56,8 +143,55 @@ public class Conectar {
         }
     }
 
-    public void insertar(Coche coche, Connection con) {
-        String sql = "insert into coche values (\"" + coche.getMatricula() + "\", \"" + coche.getDescripcion() + "\", \"" + coche.getColor() + "\", " + coche.getPrecio() + ", " + coche.isActivo() + ")";
-        System.out.println(sql);
+    public void mostrarTablaCategoria(Connection con) {
+        String sql;
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            sql = "SELECT * FROM categoria";
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                System.out.println(rs.getInt(1) + ". " + rs.getString(2));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public ArrayList<String> obtenerTablas(Connection con) {
+        ArrayList<String> lstTablas = new ArrayList<>();
+        String sql = "select TABLE_NAME from INFORMATION_SCHEMA.tables where TABLE_SCHEMA like \"proyecto_coches\"";
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                lstTablas.add(rs.getString(1));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            //TODO: handle exception
+        }
+        return lstTablas;
+    }
+
+    public void mostrarTablas(Connection con) {
+        String sql = "select TABLE_NAME from INFORMATION_SCHEMA.tables where TABLE_SCHEMA like \"proyecto_coches\"";
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                System.out.println(rs.getString(1));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            //TODO: handle exception
+        }
     }
 }

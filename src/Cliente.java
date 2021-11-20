@@ -1,9 +1,15 @@
+import java.sql.Connection;
+
 public class Cliente {
     private String dni;
     private String nombre;
     private String apellidos;
     private int telefono;
     private boolean activo;
+
+    public Cliente(){
+        activo = true;
+    }
 
     public String getDni() {
         return dni;
@@ -34,5 +40,25 @@ public class Cliente {
     }
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+    public void insertar(Conectar conectar, Connection con) {
+        String campos = "";
+        String values = "";
+        if (!nombre.isEmpty()) {
+            campos += "nombre, ";
+            values += "\"" + this.getNombre() + "\", ";
+        }
+        if (!apellidos.isEmpty()){
+            campos += "apellidos, ";
+            values += "\"" + this.getApellidos() + "\", ";
+        }
+        if (telefono != -1) {
+            campos += "precio, ";
+            values += this.getTelefono() + ", ";
+        }
+        String sql = "insert into cliente (dni, " + campos + "activo) values (\"" + this.getDni() + "\", " + values + this.isActivo() + ")";
+        conectar.ejecutarSql(con, sql);
+        System.out.println(sql);
+        System.out.println("Cliente creado correctamente");
     }
 }

@@ -9,6 +9,11 @@ public class Empleado {
     private String nombre;
     private String apellidos;
     private int telefono;
+    private boolean activo;
+
+    public Empleado(){
+        activo = true;
+    }
     
     public String getDni() {
         return dni;
@@ -40,6 +45,12 @@ public class Empleado {
     public void setTelefono(int telefono) {
         this.telefono = telefono;
     }
+    public boolean isActivo() {
+        return activo;
+    }
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
     public void iniciarSesion(Connection con) {
         String sql;
         Statement ps;
@@ -49,7 +60,6 @@ public class Empleado {
             ResultSet rs = ps.executeQuery(sql);
 
             while (rs.next()) {
-                System.out.println(rs.getString(1));
                 this.setDni(rs.getString(1));
                 this.setIdCategoria(rs.getInt(2));
                 this.setNombre(rs.getString(3));
@@ -61,5 +71,28 @@ public class Empleado {
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
+    }
+    public void insertar(Conectar conectar, Connection con) {
+        String campos = "";
+        String values = "";
+        if (idCategoria != -1) {
+            campos += "idCategoria, ";
+            values += this.getIdCategoria() + ", ";
+        }
+        if (!nombre.isEmpty()) {
+            campos += "nombre, ";
+            values += "\"" + this.getNombre() + "\", ";
+        }
+        if (!apellidos.isEmpty()){
+            campos += "apellidos, ";
+            values += "\"" + this.getApellidos() + "\", ";
+        }
+        if (telefono != -1) {
+            campos += "precio, ";
+            values += this.getTelefono() + ", ";
+        }
+        String sql = "insert into empleado (dni, " + campos + "activo) values (\"" + this.getDni() + "\", " + values + this.isActivo() + ")";
+        conectar.ejecutarSql(con, sql);
+        System.out.println("Empleado creado correctamente");
     } 
 }
