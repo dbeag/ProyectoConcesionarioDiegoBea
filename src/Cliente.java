@@ -3,6 +3,7 @@ public class Cliente {
     private String nombre;
     private String apellidos;
     private int telefono;
+    private boolean activo;
 
     public String getDni() {
         return dni;
@@ -27,5 +28,11 @@ public class Cliente {
     }
     public void setTelefono(int telefono) {
         this.telefono = telefono;
+    }
+    public boolean isActivo() {
+        return activo;
+    }
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Conectar {
@@ -15,5 +16,16 @@ public class Conectar {
 
         Connection con = DriverManager.getConnection(urlConnection, user, pwd);
         return con;
+    }
+
+    public void ejecutarSql(Connection con, String sql) {
+        PreparedStatement ps = null;
+        try {
+            ps = con.prepareStatement(sql); // Preparar sql
+            ps.execute(); // Ejecutar el script
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

@@ -5,12 +5,78 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
+
+// Problema 1. Al querer borrar registros que están relacionados pueden producirse problemas para ello en vez de borrar simplemente se establecen como activos o no activos unicamente los coches y clientes 
 public class Program {
-    public static final String MENUINICIO = "1. Iniciar sesión " + "0. Salir\n";
+    public static final String MENUINICIO = "1. Iniciar sesión " 
+    + "0. Salir\n";
+    public static final String MENUADMINISTRADOR = "1. Crear tabla \"Modificaciones\"" 
+    + "\n2. Modificar tabla \"Modificaciones\""
+    + "\n3. Añadir registros"
+    + "\n4. Modificar registros"
+    + "\n5. Borrar registros"
+    + "\n6. Consultar tablas"
+    + "\n7. Ejecutar venta"
+    + "\n8. Actualizar precio coches"
+    + "\n0. Salir";
+    public static final String MENUEMPLEADO = "1. Establecer venta"
+    + "\n2. Modificar venta"
+    + "\n3. Añadir nuevo cliente"
+    + "\n4. Modificar cliente"
+    + "\n5. Borrar cliente"
+    + "\n6. Añadir nuevo coche"
+    + "\n7. Modificar coche"
+    + "\n8. Añadir modificaciones"
+    + "\n9. Modificar modificaciones"
+    + "\n10. Eliminar modificaciones"
+    + "\n0. Salir";
+
+    // DNI admin: 18324862J
 
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         Conectar conectar = new Conectar();
+        Connection con = establecerConexion(conectar);
+        if (con == null) {
+            cerrarConexion(con);
+            sc.close();
+            return;
+        }
+        Empleado empleado = menuInicioSesion(sc, con);
+        if (empleado == null) {
+            cerrarConexion(con);
+            sc.close();
+            return;
+        }
+        if (empleado.getIdCategoria() == 1){
+            menuAdministrador(sc, con);
+        }
+        sc.close();
+    }
+
+    private static void menuAdministrador(Scanner sc, Connection con) {
+        System.out.println("Introduce una opción: ");
+        int option = pedirInt(sc, "Introduce una opción: \n" + MENUADMINISTRADOR + "\n");
+        switch (option) {
+            case 1:
+                
+                break;
+        
+            default:
+                break;
+        }
+    }
+
+    private static void cerrarConexion(Connection con) {
+        try {
+            con.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private static Connection establecerConexion(Conectar conectar) {
         Connection con = null;
         try {
             con = conectar.conectar("8882");
@@ -24,10 +90,7 @@ public class Program {
                 e1.printStackTrace();
             }
         }
-        Empleado empleado = menuInicioSesion(sc, con);
-        if (empleado == null) {
-            return;
-        }
+        return con;
     }
 
     private static Empleado menuInicioSesion(Scanner sc, Connection con) {
@@ -40,7 +103,8 @@ public class Program {
             case 1:
                 System.out.print("Introduce tu dni: ");
                 String dni = sc.nextLine();
-                empleadoActivo = iniciarSesion(con, dni);
+                empleadoActivo.setDni(dni);
+                empleadoActivo.iniciarSesion(con);
                 if (empleadoActivo.getDni() != null) {
                     System.out.println("Bienvenido " + empleadoActivo.getNombre());
                     optionInicio = 0;
@@ -58,29 +122,29 @@ public class Program {
         return empleadoActivo;
     }
 
-    private static Empleado iniciarSesion(Connection con, String dni) {
-        String sql;
-        Statement ps;
-        Empleado empleado = new Empleado();
-        try {
-            ps = con.createStatement();
-            sql = "SELECT * FROM empleado where dni = \"" + dni.toUpperCase() + "\"";
-            ResultSet rs = ps.executeQuery(sql);
+    // private static Empleado iniciarSesion(Connection con, String dni) {
+    //     String sql;
+    //     Statement ps;
+    //     Empleado empleado = new Empleado();
+    //     try {
+    //         ps = con.createStatement();
+    //         sql = "SELECT * FROM empleado where dni = \"" + dni.toUpperCase() + "\"";
+    //         ResultSet rs = ps.executeQuery(sql);
 
-            while (rs.next()) {
-                empleado.setDni(rs.getString(1));
-                empleado.setIdCategoria(rs.getInt(2));
-                empleado.setNombre(rs.getString(3));
-                empleado.setApellidos(rs.getString(4));
-                empleado.setTelefono(rs.getInt(5));
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return empleado;
-    }
+    //         while (rs.next()) {
+    //             empleado.setDni(rs.getString(1));
+    //             empleado.setIdCategoria(rs.getInt(2));
+    //             empleado.setNombre(rs.getString(3));
+    //             empleado.setApellidos(rs.getString(4));
+    //             empleado.setTelefono(rs.getInt(5));
+    //         }
+    //     } catch (SQLException ex) {
+    //         ex.printStackTrace();
+    //     }
+    //     return empleado;
+    // }
 
-    private static void ejecutarSql(Connection c, String sql) {
+    /*private static void ejecutarSql(Connection c, String sql) {
         PreparedStatement ps = null;
         try {
             ps = c.prepareStatement(sql); // Preparar sql
@@ -89,7 +153,7 @@ public class Program {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
+    }*/
 
     private static int pedirInt(Scanner sc, String msg) {
         int num = 0;
@@ -100,6 +164,19 @@ public class Program {
             sc.nextLine();
             System.out.println("Debes introducir un número");
             num = pedirInt(sc, msg);
+        }
+        return num;
+    }
+
+    private static double pedirDouble(Scanner sc, String msg) {
+        double num = 0;
+        try {
+            System.out.print(msg);
+            num = sc.nextDouble();
+        } catch (Exception e) {
+            sc.nextLine();
+            System.out.println("Debes introducir un número");
+            num = pedirDouble(sc, msg);
         }
         return num;
     }
