@@ -3,7 +3,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-// Problema 1. Al querer borrar registros que están relacionados pueden producirse problemas para ello en vez de borrar simplemente se establecen como activos o no activos unicamente los coches y clientes 
 public class Program {
     public static final String MENUINICIO = "1. Iniciar sesión " + "\n0. Salir\n";
     public static final String MENU = "1. Habilitar \"Modificaciones\"" + "\n2. Añadir" + "\n3. Modificar"
@@ -16,8 +15,6 @@ public class Program {
     public static ArrayList<Cliente> lstClientes;
     public static ArrayList<String> lstTablas;
     public static Empleado empleadoActual;
-    // DNI admin: 18324862J
-    // DNI vendedor: 18359781N
 
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
@@ -688,7 +685,8 @@ public class Program {
                 System.out.println("Conexión establecida");
             } catch (SQLException e1) {
                 // TODO Auto-generated catch block
-                e1.printStackTrace();
+                System.out.println(e1.getMessage());
+                conectar.log(e1.getMessage());
             }
         }
         return con;
