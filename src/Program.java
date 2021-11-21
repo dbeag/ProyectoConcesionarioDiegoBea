@@ -3,6 +3,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * ACCESO A DATOS
+ * DIEGO BEA GÓMEZ
+ */
 public class Program {
     public static final String MENUINICIO = "1. Iniciar sesión " + "\n0. Salir\n";
     public static final String MENU = "1. Habilitar \"Modificaciones\"" + "\n2. Añadir" + "\n3. Modificar"
