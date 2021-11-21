@@ -1,9 +1,5 @@
-import java.lang.StackWalker.Option;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -29,18 +25,18 @@ public class Program {
         Connection con = conectar.conectar();
         actualizarListas(conectar, con);
         if (con == null) {
-            cerrarConexion(con);
+            cerrarConexion(con, conectar);
             sc.close();
             return;
         }
-        empleadoActual = menuInicioSesion(sc, con);
+        empleadoActual = menuInicioSesion(sc, con, conectar);
         if (empleadoActual == null) {
-            cerrarConexion(con);
+            cerrarConexion(con, conectar);
             sc.close();
             return;
         }
         mostrarMenu(sc, con, conectar);
-        cerrarConexion(con);
+        cerrarConexion(con, conectar);
         sc.close();
     }
 
@@ -671,12 +667,13 @@ public class Program {
         return coche;
     }
 
-    private static void cerrarConexion(Connection con) {
+    private static void cerrarConexion(Connection con, Conectar conectar) {
         try {
             con.close();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            conectar.log(e.getMessage());
         }
     }
 
@@ -697,7 +694,7 @@ public class Program {
         return con;
     }
 
-    private static Empleado menuInicioSesion(Scanner sc, Connection con) {
+    private static Empleado menuInicioSesion(Scanner sc, Connection con, Conectar conectar){
         int optionInicio = -1;
         Empleado empleadoActivo = new Empleado();
         while (optionInicio != 0) {
@@ -708,7 +705,7 @@ public class Program {
                 System.out.print("Introduce tu dni: ");
                 String dni = sc.nextLine().trim();
                 empleadoActivo.setDni(dni);
-                empleadoActivo.iniciarSesion(con);
+                empleadoActivo.iniciarSesion(con, conectar);
                 if (empleadoActivo.getNombre() != null) {
                     System.out.println("Bienvenid@ " + empleadoActivo.getNombre());
                     optionInicio = 0;

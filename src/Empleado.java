@@ -64,7 +64,7 @@ public class Empleado {
         this.activo = activo;
     }
 
-    public void iniciarSesion(Connection con) {
+    public void iniciarSesion(Connection con, Conectar conectar) {
         String sql;
         Statement ps;
         try {
@@ -80,9 +80,11 @@ public class Empleado {
                 this.setTelefono(rs.getInt(5));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
+            conectar.log(ex.getMessage());
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            conectar.log(e.getMessage());
         }
     }
 
@@ -134,8 +136,8 @@ public class Empleado {
     }
 
     public void vender(Conectar conectar, Connection con, Coche coche, Cliente cliente) {
-        String sqlInsert = "insert into venta (dniEmpleado, matriculaCoche, dniCliente, fecha_venta) values (\"" + this.getDni()
-                + "\", \"" + coche.getMatricula() + "\", \"" + cliente.getDni() + "\", current_date())";
+        String sqlInsert = "insert into venta (dniEmpleado, matriculaCoche, dniCliente, fecha_venta) values (\""
+                + this.getDni() + "\", \"" + coche.getMatricula() + "\", \"" + cliente.getDni() + "\", current_date())";
         String sqlUpdate = "update coches set activo = false where matricula = \"" + coche.getMatricula() + "\"";
         ArrayList<String> lstSql = new ArrayList<>();
         lstSql.add(sqlInsert);

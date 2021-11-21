@@ -71,7 +71,7 @@ public class Coche {
         conectar.ejecutarSql(con, sql);
         System.out.println("Coche creado correctamente");
     }
-    public ArrayList<Integer> obtenerModificaciones(Connection con) {
+    public ArrayList<Integer> obtenerModificaciones(Connection con, Conectar conectar) {
         ArrayList<Integer> lstModificaciones = new ArrayList<>();
         String sql;
         Statement ps;
@@ -84,9 +84,11 @@ public class Coche {
                 lstModificaciones.add(rs.getInt(1));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(ex.getMessage());
+conectar.log(ex.getMessage());
         } catch (Exception e){
             System.out.println(e.getMessage());
+conectar.log(e.getMessage());
         }
         return lstModificaciones;
     }

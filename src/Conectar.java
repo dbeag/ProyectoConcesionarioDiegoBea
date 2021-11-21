@@ -1,5 +1,9 @@
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.file.StandardOpenOption;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,11 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,6 +22,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Conectar {
+
+    public static final File FILE = new File("src\\log\\logs.data");
 
     public Connection conectar(String port) throws SQLException {
         String basedatos = "proyecto_coches";
@@ -36,6 +40,11 @@ public class Conectar {
     }
 
     public Connection conectar() throws SQLException {
+        try {
+            Integer.parseInt("s");
+        } catch (Exception e) {
+            log(e.getMessage());
+        }
         File file = new File("src\\xml\\conexion.xml");
 
         String basedatos = "";
@@ -56,9 +65,13 @@ public class Conectar {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        // String urlConnection = "jdbc:mysql://" + host + ":" + port + "/" + basedatos
-        // + parAdic;
-        Connection con = DriverManager.getConnection(urlConnection + parAdic, user, pwd);
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection(urlConnection + parAdic, user, pwd);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            log(e.getMessage());
+        }
         return con;
     }
 
@@ -79,8 +92,22 @@ public class Conectar {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
         return pwd;
+    }
+
+    public void log(String message) {
+        try {
+            OutputStreamWriter os = new OutputStreamWriter(new FileOutputStream(FILE, true));
+            os.append(message + "\n");
+            os.flush();
+            os.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            System.out.println(e.getMessage());
+            log(e.getMessage());
+        }
     }
 
     private String obtenerUser(File file) {
@@ -100,6 +127,7 @@ public class Conectar {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
         ;
         return user;
@@ -124,8 +152,8 @@ public class Conectar {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
-        ;
         return url;
     }
 
@@ -139,6 +167,7 @@ public class Conectar {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
+            log(e.getMessage());
             return false;
         }
     }
@@ -164,8 +193,10 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
+            log(ex.getMessage());
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
         return lstEmpleado;
     }
@@ -190,8 +221,10 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
+            log(ex.getMessage());
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
         return lstCliente;
     }
@@ -214,14 +247,16 @@ public class Conectar {
                 coche.setPrecio(rs.getDouble(4));
                 coche.setActivo(rs.getBoolean(5));
                 if (lstTablas.contains("modificaciones")) {
-                    coche.setLstModificaciones(coche.obtenerModificaciones(con));
+                    coche.setLstModificaciones(coche.obtenerModificaciones(con, this));
                 }
                 lstCoche.add(coche);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
+            log(ex.getMessage());
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
         return lstCoche;
     }
@@ -236,6 +271,7 @@ public class Conectar {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
     }
 
@@ -249,6 +285,7 @@ public class Conectar {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
     }
 
@@ -265,8 +302,10 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
+            log(ex.getMessage());
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
     }
 
@@ -283,6 +322,7 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
             // TODO: handle exception
         }
         return lstTablas;
@@ -300,6 +340,7 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
             // TODO: handle exception
         }
     }
@@ -323,6 +364,7 @@ public class Conectar {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
     }
 
@@ -341,6 +383,7 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
             // TODO: handle exception
         }
         return exist;
@@ -361,6 +404,7 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
             // TODO: handle exception
         }
         return exist;
@@ -389,6 +433,7 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
             // TODO: handle exception
         }
         return exist;
@@ -418,6 +463,7 @@ public class Conectar {
             System.out.println("Precio del coche actualizado");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
     }
 
@@ -439,6 +485,7 @@ public class Conectar {
             ex.printStackTrace();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
         return lstIds;
     }
@@ -461,6 +508,7 @@ public class Conectar {
             ex.printStackTrace();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
         ejecutarProcedimiento(con, precio, false, matricula);
         sql = "delete from modificaciones where idModificacion = " + id;
@@ -502,6 +550,7 @@ public class Conectar {
             ex.printStackTrace();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
     }
 
@@ -540,6 +589,7 @@ public class Conectar {
             ex.printStackTrace();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            log(e.getMessage());
         }
     }
 }
