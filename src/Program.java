@@ -40,21 +40,24 @@ public class Program {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         Conectar conectar = new Conectar();
-        Connection con = establecerConexion(conectar);
-        actualizarListas(conectar, con);
-        if (con == null) {
-            cerrarConexion(con);
-            sc.close();
-            return;
-        }
-        empleadoActual = menuInicioSesion(sc, con);
-        if (empleadoActual == null) {
-            cerrarConexion(con);
-            sc.close();
-            return;
-        }
-        mostrarMenu(sc, con, conectar);
-        sc.close();
+        Connection con = conectar.conectar();
+        return;
+        //Connection con = establecerConexion(conectar);
+        // actualizarListas(conectar, con);
+        // if (con == null) {
+        //     cerrarConexion(con);
+        //     sc.close();
+        //     return;
+        // }
+        // empleadoActual = menuInicioSesion(sc, con);
+        // if (empleadoActual == null) {
+        //     cerrarConexion(con);
+        //     sc.close();
+        //     return;
+        // }
+        // mostrarMenu(sc, con, conectar);
+        // cerrarConexion(con);
+        // sc.close();
     }
 
     private static void actualizarListas(Conectar conectar, Connection con) {

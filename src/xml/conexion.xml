@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<conexiones>
+    <conexion>
+        <database>proyecto_coches</database>
+        <host>servidorifc.iesch.org</host>
+        <port>8883</port>
+        <user>2_bea_d</user>
+        <pwd>5rf74</pwd>
+    </conexion>
+</conexiones>

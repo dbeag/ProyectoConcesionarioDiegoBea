@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,6 +9,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class Conectar {
 
@@ -22,6 +33,103 @@ public class Conectar {
 
         Connection con = DriverManager.getConnection(urlConnection, user, pwd);
         return con;
+    }
+
+    public Connection conectar() throws SQLException {
+        File file = new File("src\\xml\\conexion.xml");
+
+        String basedatos = "";
+        String host = "";
+        String port = "";
+        String user = "";
+        String pwd = "";
+        String urlConnection = "";
+        String parAdic = "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false";
+        try {
+            urlConnection = obtenerUrl(file);
+            user = obtenerUser(file);
+            pwd = obtenerPwd(file);
+        } catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // String urlConnection = "jdbc:mysql://" + host + ":" + port + "/" + basedatos
+        // + parAdic;
+        Connection con = DriverManager.getConnection(urlConnection + parAdic, user, pwd);
+        return con;
+    }
+
+    private String obtenerPwd(File file) {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db;
+        Document doc = null;
+        String pwd = "";
+        try {
+            db = dbf.newDocumentBuilder();
+            doc = db.parse(file);
+            NodeList nList = doc.getElementsByTagName("conexion");
+            for (int i = 0; i < nList.getLength(); i++) {
+                Node nNode = nList.item(i);
+                System.out.println("\nCurrent Element :" + nNode.getNodeName());
+                Element element = (Element) nNode;
+                pwd = element.getElementsByTagName("pwd").item(0).getTextContent();
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            System.out.println(e.getMessage());
+        }
+        return pwd;
+    }
+
+    private String obtenerUser(File file) {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db;
+        Document doc = null;
+        String user = "";
+        try {
+            db = dbf.newDocumentBuilder();
+            doc = db.parse(file);
+            NodeList nList = doc.getElementsByTagName("conexion");
+            for (int i = 0; i < nList.getLength(); i++) {
+                Node nNode = nList.item(i);
+                System.out.println("\nCurrent Element :" + nNode.getNodeName());
+                Element element = (Element) nNode;
+                user = element.getElementsByTagName("user").item(0).getTextContent();
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            System.out.println(e.getMessage());
+        }
+        ;
+        return user;
+    }
+
+    private String obtenerUrl(File file) throws SAXException, IOException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db;
+        Document doc = null;
+        String url = "jdbc:mysql://";
+        try {
+            db = dbf.newDocumentBuilder();
+            doc = db.parse(file);
+            NodeList nList = doc.getElementsByTagName("conexion");
+            for (int i = 0; i < nList.getLength(); i++) {
+                Node nNode = nList.item(i);
+                System.out.println("\nCurrent Element :" + nNode.getNodeName());
+                Element element = (Element) nNode;
+                url += element.getElementsByTagName("host").item(0).getTextContent() + ":";
+                url += element.getElementsByTagName("port").item(0).getTextContent() + "/";
+                url += element.getElementsByTagName("database").item(0).getTextContent();
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            System.out.println(e.getMessage());
+        }
+        ;
+        return url;
     }
 
     public boolean ejecutarSql(Connection con, String sql) {
