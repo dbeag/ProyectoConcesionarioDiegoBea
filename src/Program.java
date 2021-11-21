@@ -428,7 +428,13 @@ public class Program {
                 coche.setColor(color);
                 modificado = true;
             }
-            double precio = pedirDouble(sc, "Introduce el nuevo precio (omita para cancelar): ", true);
+            double precio = -2;
+            while (precio < -1) {
+                precio = pedirDouble(sc, "Introduce el nuevo precio (omita para cancelar): ", true);
+                if (precio < -1) {
+                    System.out.println("Debes introducir un precio mayor que 0");
+                }
+            }
             if (precio != -1) {
                 coche.setPrecio(precio);
                 modificado = true;
@@ -604,7 +610,7 @@ public class Program {
             Integer.parseInt(dni.substring(0, 7));
         } catch (Exception e) {
             correcto = false;
-            //TODO: handle exception
+            // TODO: handle exception
         }
         return correcto;
     }
@@ -663,7 +669,14 @@ public class Program {
             }
         }
         coche.setDescripcion(descripcion);
-        coche.setPrecio(pedirDouble(sc, "Introduce el precio: ", true));
+        double precio = -2;
+        while (precio < -1) {
+            precio = pedirDouble(sc, "Introduce el precio: ", true);
+            if (precio < -1) {
+                System.out.println("Debes introducir un precio mayor que 0");
+            }
+        }
+        coche.setPrecio(precio);
         System.out.print("Introduce el color: ");
         coche.setColor(sc.nextLine());
         coche.setActivo(true);
