@@ -3,7 +3,7 @@
     <conexion>
         <database>proyecto_coches</database>
         <host>servidorifc.iesch.org</host>
-        <port>8882</port>
+        <port>3306</port>
         <user>2_bea_d</user>
         <pwd>5rf74</pwd>
     </conexion>
