@@ -11,12 +11,9 @@ import java.util.Scanner;
 public class Program {
     public static final String MENUINICIO = "1. Iniciar sesión " + "\n0. Salir\n";
     public static final String MENU = "1. Habilitar \"Modificaciones\"" + "\n2. Añadir" + "\n3. Modificar"
-            + "\n4. Eliminar" + "\n5 Consultar" + "\n6. Nueva venta" + "\n0. Salir";
-    public static final String MENUCONSULTA = "1. Consultar mis ventas"
-    + "\n2. Consultar coches vendidos"
-    + "\n3. Consultar coches disponibles"
-    + "\n4. Consultar clientes"
-    + "\n0. Volver";
+            + "\n4. Eliminar" + "\n5. Consultar" + "\n6. Nueva venta" + "\n0. Salir";
+    public static final String MENUCONSULTA = "1. Consultar mis ventas" + "\n2. Consultar coches vendidos"
+            + "\n3. Consultar coches disponibles" + "\n4. Consultar clientes" + "\n0. Volver" + "\n";
 
     // Procedimiento: Establecer como inactivos los coches que se vendan
     /*
@@ -107,26 +104,53 @@ public class Program {
 
     private static void consultar(Conectar conectar, Connection con, Scanner sc) {
         while (true) {
-            int option = pedirInt(sc, MENUCONSULTA + "\n ", false);
+            int option = pedirInt(sc, MENUCONSULTA, false);
             switch (option) {
-                case 1:
-                    System.out.println("Mis ventas:");
-                    conectar.consultarVentas(empleadoActual.getDni(), con);
-                    break;
-                case 2:
-                    System.out.println("Coches vendidos: ");
-                    break;
-                case 3:
-                    System.out.println("Coches disponibles: ");
-                    break;
-                case 4:
-                    System.out.println("Clientes:");
-                    break;
-                case 0:
-                    return;
-                default:
-                    System.out.println("Opción errónea");
-                    break;
+            case 1:
+                System.out.println("Mis ventas:");
+                conectar.consultarVentas(empleadoActual.getDni(), con);
+                break;
+            case 2:
+                System.out.println("Coches vendidos: ");
+                conectar.consultarVendidos(con);
+                break;
+            case 3:
+                System.out.println("Coches disponibles: ");
+                actualizarListas(conectar, con);
+                if (lstCoches.size() == 0) {
+                    System.out.println("No hay coches disponibles");
+                } else {
+                    for (Coche coche : lstCoches) {
+                        System.out.println("Matrícula: " + coche.getMatricula());
+                        System.out.println("Coche: " + coche.getDescripcion());
+                        System.out.println("Precio: " + coche.getPrecio());
+                        System.out.println("Color: " + coche.getColor());
+                    }
+                }
+                break;
+            case 4:
+                System.out.println("Clientes: ");
+                actualizarListas(conectar, con);
+                if (lstClientes.size() == 0) {
+                    System.out.println("No hay clientes");
+                } else {
+                    for (Cliente cliente : lstClientes) {
+                        if (cliente.getApellidos() == null) {
+                            System.out.println("Ciente: " + cliente.getNombre());
+                        } else {
+                            System.out.println("Ciente: " + cliente.getNombre() + " " + cliente.getApellidos());
+                        }
+                        if (cliente.getTelefono() != 0) {
+                            System.out.println("Teléfono: " + cliente.getTelefono());
+                        }
+                    }
+                }
+                break;
+            case 0:
+                return;
+            default:
+                System.out.println("Opción errónea");
+                break;
             }
         }
     }
@@ -538,18 +562,32 @@ public class Program {
     private static Empleado insertarDatosEmpleado(Scanner sc, Conectar conectar, Connection con) {
         Empleado empleado = new Empleado();
         String dni = "";
-        while (dni.isEmpty()) {
+        boolean dniNormalizado = false;
+        while (!dniNormalizado) {
             System.out.print("Introduce el dni del empleado: ");
             dni = sc.nextLine().trim();
             if (dni.isEmpty()) {
                 System.out.println("Debes introducir del dni del empleado: ");
+            } else {
+                if (!normalizarDni(dni)) {
+                    System.out.println("Formato de DNI incorrecto");
+                } else {
+                    dniNormalizado = true;
+                }
             }
         }
         empleado.setDni(dni);
         conectar.mostrarTablaCategoria(con);
         empleado.setIdCategoria(pedirInt(sc, "Introduce la categoria: ", true));
-        System.out.print("Introduce el nombre del empleado: ");
-        empleado.setNombre(sc.nextLine().trim());
+        String nombre = "";
+        while (nombre.isEmpty()) {
+            System.out.print("Introduce el nombre del empleado: ");
+            nombre = sc.nextLine().trim();
+            if (nombre.isEmpty()) {
+                System.out.println("Debes introducir el nombre del empleado: ");
+            }
+        }
+        empleado.setNombre(nombre);
         System.out.print("Introduce los apellidos del empleado: ");
         empleado.setApellidos(sc.nextLine().trim());
         empleado.setTelefono(pedirInt(sc, "Introduce el teléfono del empleado: ", true));
@@ -557,19 +595,47 @@ public class Program {
         return empleado;
     }
 
+    private static boolean normalizarDni(String dni) {
+        boolean correcto = true;
+        if (dni.length() != 8) {
+            return false;
+        }
+        try {
+            Integer.parseInt(dni.substring(0, 7));
+        } catch (Exception e) {
+            correcto = false;
+            //TODO: handle exception
+        }
+        return correcto;
+    }
+
     private static Cliente insertarDatosCliente(Scanner sc) {
         Cliente cliente = new Cliente();
         String dni = "";
-        while (dni.isEmpty()) {
+        boolean dniNormalizado = false;
+        while (!dniNormalizado) {
             System.out.print("Introduce el dni del cliente: ");
             dni = sc.nextLine().trim();
             if (dni.isEmpty()) {
                 System.out.println("Debes introducir del dni del cliente: ");
+            } else {
+                if (!normalizarDni(dni)) {
+                    System.out.println("Formato de DNI incorrecto");
+                } else {
+                    dniNormalizado = true;
+                }
             }
         }
         cliente.setDni(dni);
-        System.out.print("Introduce el nombre del cliente: ");
-        cliente.setNombre(sc.nextLine());
+        String nombre = "";
+        while (nombre.isEmpty()) {
+            System.out.print("Introduce el nombre del cliente: ");
+            nombre = sc.nextLine().trim();
+            if (nombre.isEmpty()) {
+                System.out.println("Debes introducir el nombre del cliente: ");
+            }
+        }
+        cliente.setNombre(nombre);
         System.out.print("Introduce los apellidos del cliente: ");
         cliente.setApellidos(sc.nextLine());
         cliente.setTelefono(pedirInt(sc, "Introduce el teléfono del cliente: ", true));

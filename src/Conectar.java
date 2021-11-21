@@ -59,7 +59,7 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return lstEmpleado;
@@ -85,7 +85,7 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return lstCliente;
@@ -115,7 +115,7 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return lstCoche;
@@ -160,7 +160,7 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -178,7 +178,7 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            //TODO: handle exception
+            // TODO: handle exception
         }
         return lstTablas;
     }
@@ -195,7 +195,7 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            //TODO: handle exception
+            // TODO: handle exception
         }
     }
 
@@ -223,7 +223,7 @@ public class Conectar {
 
     public boolean comprobarVenta(Coche coche, Connection con) {
         boolean exist = false;
-        String sql = "select count(*) from venta where matriculaCoche like \"" + coche.getMatricula()+ "\"";
+        String sql = "select count(*) from venta where matriculaCoche like \"" + coche.getMatricula() + "\"";
         Statement ps;
         try {
             ps = con.createStatement();
@@ -236,14 +236,14 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            //TODO: handle exception
+            // TODO: handle exception
         }
         return exist;
     }
 
     public boolean comprobarVenta(Cliente cliente, Connection con) {
         boolean exist = false;
-        String sql = "select count(*) from venta where dniCliente like \"" + cliente.getDni()+ "\"";
+        String sql = "select count(*) from venta where dniCliente like \"" + cliente.getDni() + "\"";
         Statement ps;
         try {
             ps = con.createStatement();
@@ -256,21 +256,22 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            //TODO: handle exception
+            // TODO: handle exception
         }
         return exist;
     }
 
     public void eliminarVenta(Connection con, Conectar conectar, Coche coche, Empleado empleadoActual) {
         ArrayList<String> lstSql = new ArrayList<>();
-        lstSql.add("delete from venta where dniEmpleado like \"" + empleadoActual.getDni() + "\" && matriculaCoche like \"" + coche.getMatricula() + "\"");
+        lstSql.add("delete from venta where dniEmpleado like \"" + empleadoActual.getDni()
+                + "\" && matriculaCoche like \"" + coche.getMatricula() + "\"");
         lstSql.add("update coches set activo = true where matricula = \"" + coche.getMatricula() + "\"");
         ejecutarTransaction(con, lstSql);
     }
 
     public boolean comprobarVenta(Empleado empleadoActual, Connection con) {
         boolean exist = false;
-        String sql = "select count(*) from venta where dniEmpleado like \"" + empleadoActual.getDni()+ "\"";
+        String sql = "select count(*) from venta where dniEmpleado like \"" + empleadoActual.getDni() + "\"";
         Statement ps;
         try {
             ps = con.createStatement();
@@ -283,7 +284,7 @@ public class Conectar {
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            //TODO: handle exception
+            // TODO: handle exception
         }
         return exist;
     }
@@ -291,9 +292,11 @@ public class Conectar {
     public void insertarModificacion(Connection con, String descripcion, double precio, String matricula) {
         String sql = "";
         if (precio != -1) {
-            sql = "insert into modificaciones (matriculaCoche, descripcion, precio) values (\"" + matricula + "\", \"" + descripcion + "\", " + precio + ")";
+            sql = "insert into modificaciones (matriculaCoche, descripcion, precio) values (\"" + matricula + "\", \""
+                    + descripcion + "\", " + precio + ")";
         } else {
-            sql = "insert into modificaciones (matriculaCoche, descripcion) values (\"" + matricula + "\", \"" + descripcion + "\")";
+            sql = "insert into modificaciones (matriculaCoche, descripcion) values (\"" + matricula + "\", \""
+                    + descripcion + "\")";
         }
         if (ejecutarSql(con, sql) && precio != -1) {
             ejecutarProcedimiento(con, precio, true, matricula);
@@ -319,7 +322,8 @@ public class Conectar {
         Statement ps;
         try {
             ps = con.createStatement();
-            sql = "SELECT idModificacion, descripcion FROM modificaciones where matriculaCoche like \"" + matricula + "\"";
+            sql = "SELECT idModificacion, descripcion FROM modificaciones where matriculaCoche like \"" + matricula
+                    + "\"";
             ResultSet rs = ps.executeQuery(sql);
 
             while (rs.next()) {
@@ -328,7 +332,7 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return lstIds;
@@ -350,7 +354,7 @@ public class Conectar {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         ejecutarProcedimiento(con, precio, false, matricula);
@@ -363,20 +367,73 @@ public class Conectar {
         Statement ps;
         try {
             ps = con.createStatement();
-            sql = "select c.matricula, c.descripcion, c.precio, m.descripcion, v.fecha_venta from coches c join modificaciones m join venta v on c.matricula = v.matriculaCoche && c.matricula = m.matriculaCoche where v.dniEmpleado like \"" + dni + "\"";
-            ResultSet rs = ps.executeQuery(sql);
+            if (obtenerTablas(con).contains("modificaciones")) {
+                sql = "select c.matricula, c.descripcion, c.precio, m.descripcion, v.fecha_venta from coches c join modificaciones m join venta v on c.matricula = v.matriculaCoche && c.matricula = m.matriculaCoche where v.dniEmpleado like \""
+                        + dni + "\"";
+                ResultSet rs = ps.executeQuery(sql);
 
-            while (rs.next()) {
-                System.out.println("Matricula: " + rs.getString(1));
-                System.out.println("Coche: " + rs.getString(2));
-                System.out.println("Precio: " + rs.getInt(3));
-                System.out.println("Modificacion: " + rs.getString(4));
-                System.out.println("Fecha de venta: " + rs.getDate(5));
-                System.out.println("\n");
+                while (rs.next()) {
+                    System.out.println("Matricula: " + rs.getString(1));
+                    System.out.println("Coche: " + rs.getString(2));
+                    System.out.println("Precio: " + rs.getInt(3));
+                    System.out.println("Modificacion: " + rs.getString(4));
+                    System.out.println("Fecha de venta: " + rs.getDate(5));
+                    System.out.println("\n");
+                }
+            } else {
+                sql = "select c.matricula, c.descripcion, c.precio, v.fecha_venta from coches c join venta v on c.matricula = v.matriculaCoche where v.dniEmpleado like \""
+                        + dni + "\"";
+                ResultSet rs = ps.executeQuery(sql);
+
+                while (rs.next()) {
+                    System.out.println("Matricula: " + rs.getString(1));
+                    System.out.println("Coche: " + rs.getString(2));
+                    System.out.println("Precio: " + rs.getInt(3));
+                    System.out.println("Fecha de venta: " + rs.getDate(4));
+                    System.out.println("\n");
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void consultarVendidos(Connection con) {
+        String sql;
+        Statement ps;
+        ArrayList<String> lstTablas = obtenerTablas(con);
+        try {
+            if (obtenerTablas(con).contains("modificaciones")) {
+                ps = con.createStatement();
+                sql = "SELECT c.matricula, c.descripcion, c.precio, c.color, m.descripcion from coches c join modificaciones m on c.matricula = m.matriculaCoche where activo = false";
+                ResultSet rs = ps.executeQuery(sql);
+                while (rs.next()) {
+                    System.out.println("Matricula: " + rs.getString(1));
+                    System.out.println("Coche: " + rs.getString(2));
+                    System.out.println("Precio: " + rs.getInt(3));
+                    System.out.println("Color: " + rs.getString(4));
+                    System.out.println("Modificacion: " + rs.getString(5));
+                    System.out.println("\n");
+                }
+            } else {
+                ps = con.createStatement();
+                sql = "SELECT matricula, descripcion, precio, color FROM coches where activo = false";
+                ResultSet rs = ps.executeQuery(sql);
+
+                while (rs.next()) {
+                    System.out.println("Matricula: " + rs.getString(1));
+                    System.out.println("Coche: " + rs.getString(2));
+                    System.out.println("Precio: " + rs.getInt(3));
+                    System.out.println("Color: " + rs.getString(4));
+                    System.out.println("\n");
+                }
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
