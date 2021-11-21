@@ -123,32 +123,3 @@ conectar.log(e.getMessage());
         conectar.ejecutarSql(con, sql);
     }
 }
-
-/*class Modificaciones{
-    private int id;
-    private String matriculaCoche;
-    private String descripcion;
-    private double precio;
-
-    public int getId() {
-        return id;
-    }
-    public String getMatriculaCoche() {
-        return matriculaCoche;
-    }
-    public void setMatriculaCoche(String matriculaCoche) {
-        this.matriculaCoche = matriculaCoche;
-    }
-    public String getDescripcion() {
-        return descripcion;
-    }
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-    public double getPrecio() {
-        return precio;
-    }
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
-}*/

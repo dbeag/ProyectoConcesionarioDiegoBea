@@ -1,9 +1,7 @@
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.file.StandardOpenOption;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -46,10 +44,6 @@ public class Conectar {
             log(e.getMessage());
         }
         File file = new File("src\\xml\\conexion.xml");
-
-        String basedatos = "";
-        String host = "";
-        String port = "";
         String user = "";
         String pwd = "";
         String urlConnection = "";
@@ -557,7 +551,6 @@ public class Conectar {
     public void consultarVendidos(Connection con) {
         String sql;
         Statement ps;
-        ArrayList<String> lstTablas = obtenerTablas(con);
         try {
             if (obtenerTablas(con).contains("modificaciones")) {
                 ps = con.createStatement();
