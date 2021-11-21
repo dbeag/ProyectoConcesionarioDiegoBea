@@ -1,3 +1,4 @@
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -23,14 +24,17 @@ public class Conectar {
         return con;
     }
 
-    public void ejecutarSql(Connection con, String sql) {
+    public boolean ejecutarSql(Connection con, String sql) {
         PreparedStatement ps = null;
         try {
             ps = con.prepareStatement(sql); // Preparar sql
             ps.execute(); // Ejecutar el script
+            System.out.println("Acción ejecutada correctamente");
+            return true;
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
@@ -255,5 +259,125 @@ public class Conectar {
             //TODO: handle exception
         }
         return exist;
+    }
+
+    public void eliminarVenta(Connection con, Conectar conectar, Coche coche, Empleado empleadoActual) {
+        ArrayList<String> lstSql = new ArrayList<>();
+        lstSql.add("delete from venta where dniEmpleado like \"" + empleadoActual.getDni() + "\" && matriculaCoche like \"" + coche.getMatricula() + "\"");
+        lstSql.add("update coches set activo = true where matricula = \"" + coche.getMatricula() + "\"");
+        ejecutarTransaction(con, lstSql);
+    }
+
+    public boolean comprobarVenta(Empleado empleadoActual, Connection con) {
+        boolean exist = false;
+        String sql = "select count(*) from venta where dniEmpleado like \"" + empleadoActual.getDni()+ "\"";
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                if (rs.getInt(1) > 0) {
+                    exist = true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            //TODO: handle exception
+        }
+        return exist;
+    }
+
+    public void insertarModificacion(Connection con, String descripcion, double precio, String matricula) {
+        String sql = "";
+        if (precio != -1) {
+            sql = "insert into modificaciones (matriculaCoche, descripcion, precio) values (\"" + matricula + "\", \"" + descripcion + "\", " + precio + ")";
+        } else {
+            sql = "insert into modificaciones (matriculaCoche, descripcion) values (\"" + matricula + "\", \"" + descripcion + "\")";
+        }
+        if (ejecutarSql(con, sql) && precio != -1) {
+            ejecutarProcedimiento(con, precio, true, matricula);
+        }
+    }
+
+    private void ejecutarProcedimiento(Connection con, double precio, boolean sumar, String matricula) {
+        try {
+            CallableStatement cs = con.prepareCall("{call actualizarPrecioModificacion (?, ?, ?)}");
+            cs.setDouble(1, precio);
+            cs.setBoolean(2, sumar);
+            cs.setString(3, matricula);
+            cs.execute();
+            System.out.println("Precio del coche actualizado");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public ArrayList<Integer> mostrarTablaModificaciones(Connection con, String matricula) {
+        ArrayList<Integer> lstIds = new ArrayList<>();
+        String sql;
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            sql = "SELECT idModificacion, descripcion FROM modificaciones where matriculaCoche like \"" + matricula + "\"";
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                System.out.println(rs.getInt(1) + ". " + rs.getString(2));
+                lstIds.add(rs.getInt(1));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return lstIds;
+    }
+
+    public void eliminarMod(Connection con, Conectar conectar, int id) {
+        String sql;
+        Statement ps;
+        String matricula = "";
+        double precio = -1;
+        try {
+            ps = con.createStatement();
+            sql = "SELECT matriculaCoche, precio FROM modificaciones where idModificacion = " + id;
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                matricula = rs.getString(1);
+                precio = rs.getDouble(2);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        ejecutarProcedimiento(con, precio, false, matricula);
+        sql = "delete from modificaciones where idModificacion = " + id;
+        ejecutarSql(con, sql);
+    }
+
+    public void consultarVentas(String dni, Connection con) {
+        String sql;
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            sql = "select c.matricula, c.descripcion, c.precio, m.descripcion, v.fecha_venta from coches c join modificaciones m join venta v on c.matricula = v.matriculaCoche && c.matricula = m.matriculaCoche where v.dniEmpleado like \"" + dni + "\"";
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                System.out.println("Matricula: " + rs.getString(1));
+                System.out.println("Coche: " + rs.getString(2));
+                System.out.println("Precio: " + rs.getInt(3));
+                System.out.println("Modificacion: " + rs.getString(4));
+                System.out.println("Fecha de venta: " + rs.getDate(5));
+                System.out.println("\n");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }

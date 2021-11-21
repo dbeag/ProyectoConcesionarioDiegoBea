@@ -113,6 +113,8 @@ public class Coche {
     public void eliminar(Connection con, Conectar conectar) {
         String sql = "";
         if (!conectar.comprobarVenta(this, con)) {
+            sql = "delete from modificaciones where matriculaCoche like \"" + this.getMatricula() + "\"";
+            conectar.ejecutarSql(con, sql);
             sql = "delete from coches where matricula like \"" + this.getMatricula() + "\"";
             conectar.ejecutarSql(con, sql);
         }

@@ -142,4 +142,14 @@ public class Empleado {
         lstSql.add(sqlUpdate);
         conectar.ejecutarTransaction(con, lstSql);
     }
+
+    public void eliminar(Connection con, Conectar conectar) {
+        String sql = "";
+        if (!conectar.comprobarVenta(this, con)) {
+            sql = "delete from empleado where dni like \"" + this.getDni() + "\"";
+        } else {
+            sql = "update from empleado set activo = false where dni like \"" + this.getDni() + "\"";
+        }
+        conectar.ejecutarSql(con, sql);
+    }
 }

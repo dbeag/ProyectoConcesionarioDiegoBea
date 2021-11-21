@@ -83,7 +83,9 @@ public class Cliente {
     public void eliminar(Connection con, Conectar conectar) {
         String sql = "";
         if (!conectar.comprobarVenta(this, con)) {
-            sql = "delete from coches where matricula like \"" + this.getDni() + "\"";
+            sql = "delete from cliente where dni like \"" + this.getDni() + "\"";
+        } else {
+            sql = "update from cliente set activo = false where dni like \"" + this.getDni() + "\"";
         }
         conectar.ejecutarSql(con, sql);
     }
