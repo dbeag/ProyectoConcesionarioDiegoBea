@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class Empleado {
     private String dni;
@@ -11,46 +12,58 @@ public class Empleado {
     private int telefono;
     private boolean activo;
 
-    public Empleado(){
+    public Empleado() {
         activo = true;
     }
-    
+
     public String getDni() {
         return dni;
     }
+
     public void setDni(String dni) {
         this.dni = dni;
     }
+
     public int getIdCategoria() {
         return idCategoria;
     }
+
     public void setIdCategoria(int idCategoria) {
         this.idCategoria = idCategoria;
     }
+
     public String getNombre() {
         return nombre;
     }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
     public String getApellidos() {
         return apellidos;
     }
+
     public void setApellidos(String apellidos) {
         this.apellidos = apellidos;
     }
+
     public int getTelefono() {
         return telefono;
     }
+
     public void setTelefono(int telefono) {
         this.telefono = telefono;
     }
+
     public boolean isActivo() {
         return activo;
     }
+
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
+
     public void iniciarSesion(Connection con) {
         String sql;
         Statement ps;
@@ -68,10 +81,11 @@ public class Empleado {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
+
     public void insertar(Conectar conectar, Connection con) {
         String campos = "";
         String values = "";
@@ -83,7 +97,7 @@ public class Empleado {
             campos += "nombre, ";
             values += "\"" + this.getNombre() + "\", ";
         }
-        if (!apellidos.isEmpty()){
+        if (!apellidos.isEmpty()) {
             campos += "apellidos, ";
             values += "\"" + this.getApellidos() + "\", ";
         }
@@ -91,7 +105,8 @@ public class Empleado {
             campos += "precio, ";
             values += this.getTelefono() + ", ";
         }
-        String sql = "insert into empleado (dni, " + campos + "activo) values (\"" + this.getDni() + "\", " + values + this.isActivo() + ")";
+        String sql = "insert into empleado (dni, " + campos + "activo) values (\"" + this.getDni() + "\", " + values
+                + this.isActivo() + ")";
         conectar.ejecutarSql(con, sql);
         System.out.println("Empleado creado correctamente");
     }
@@ -109,12 +124,22 @@ public class Empleado {
         }
         if (this.getTelefono() != -1) {
             sql += "telefono = " + this.getTelefono();
-        } else{
+        } else {
             // Quitar ", "
             sql = sql.substring(0, sql.length() - 2);
         }
         sql += " where dni like \"" + this.getDni() + "\"";
         conectar.ejecutarSql(con, sql);
         System.out.println("Empleado actualizado");
+    }
+
+    public void vender(Conectar conectar, Connection con, Coche coche, Cliente cliente) {
+        String sqlInsert = "insert into venta (dniEmpleado, matriculaCoche, dniCliente, fecha_venta) values (\"" + this.getDni()
+                + "\", \"" + coche.getMatricula() + "\", \"" + cliente.getDni() + "\", current_date())";
+        String sqlUpdate = "update coches set activo = false where matricula = \"" + coche.getMatricula() + "\"";
+        ArrayList<String> lstSql = new ArrayList<>();
+        lstSql.add(sqlInsert);
+        lstSql.add(sqlUpdate);
+        conectar.ejecutarTransaction(con, lstSql);
     }
 }

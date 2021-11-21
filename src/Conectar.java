@@ -199,4 +199,61 @@ public class Conectar {
         String sql = "insert into categoria (nombreCategoria, salario) values (\"" + nombre + "\", " + salario + ")";
         ejecutarSql(con, sql);
     }
+
+    public void ejecutarTransaction(Connection con, ArrayList<String> lstSql) {
+        PreparedStatement ps = null;
+        try {
+            con.setAutoCommit(false);
+            for (String sql : lstSql) {
+                ps = con.prepareStatement(sql);
+                ps.execute();
+            }
+            con.commit();
+            con.setAutoCommit(true);
+            System.out.println("Acción realizada correctamente");
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public boolean comprobarVenta(Coche coche, Connection con) {
+        boolean exist = false;
+        String sql = "select count(*) from venta where matriculaCoche like \"" + coche.getMatricula()+ "\"";
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                if (rs.getInt(1) > 0) {
+                    exist = true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            //TODO: handle exception
+        }
+        return exist;
+    }
+
+    public boolean comprobarVenta(Cliente cliente, Connection con) {
+        boolean exist = false;
+        String sql = "select count(*) from venta where dniCliente like \"" + cliente.getDni()+ "\"";
+        Statement ps;
+        try {
+            ps = con.createStatement();
+            ResultSet rs = ps.executeQuery(sql);
+
+            while (rs.next()) {
+                if (rs.getInt(1) > 0) {
+                    exist = true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            //TODO: handle exception
+        }
+        return exist;
+    }
 }

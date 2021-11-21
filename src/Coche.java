@@ -109,6 +109,15 @@ public class Coche {
         conectar.ejecutarSql(con, sql);
         System.out.println("Coche actualizado");
     }
+
+    public void eliminar(Connection con, Conectar conectar) {
+        String sql = "";
+        if (!conectar.comprobarVenta(this, con)) {
+            sql = "delete from coches where matricula like \"" + this.getMatricula() + "\"";
+            conectar.ejecutarSql(con, sql);
+        }
+        conectar.ejecutarSql(con, sql);
+    }
 }
 
 /*class Modificaciones{

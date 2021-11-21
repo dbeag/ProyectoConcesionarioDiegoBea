@@ -79,4 +79,12 @@ public class Cliente {
         conectar.ejecutarSql(con, sql);
         System.out.println("Cliente actualizado");
     }
+
+    public void eliminar(Connection con, Conectar conectar) {
+        String sql = "";
+        if (!conectar.comprobarVenta(this, con)) {
+            sql = "delete from coches where matricula like \"" + this.getDni() + "\"";
+        }
+        conectar.ejecutarSql(con, sql);
+    }
 }

@@ -10,19 +10,24 @@ import java.util.Scanner;
 // Problema 1. Al querer borrar registros que están relacionados pueden producirse problemas para ello en vez de borrar simplemente se establecen como activos o no activos unicamente los coches y clientes 
 public class Program {
     public static final String MENUINICIO = "1. Iniciar sesión " + "\n0. Salir\n";
-    public static final String MENUADMINISTRADOR = "1. Crear \"Modificaciones\""
-            + "\n2. Añadir \"Precio\" a \"Modificaciones\"" + "\n3. Añadir registros" + "\n4. Modificar registros"
-            + "\n0. Salir";
+    public static final String MENU = "1. Habilitar \"Modificaciones\""
+            + "\n2. Habilitar \"Precio\" a \"Modificaciones\"" + "\n3. Añadir" + "\n4. Modificar" + "\n5. Eliminar"
+            + "\n6. Nueva venta" + "\n0. Salir";
+
     // Procedimiento: Establecer como inactivos los coches que se vendan
-    public static final String MENUVENDEDOR = "1. Establecer venta" + "\n2. Añadir nuevo cliente"
-            + "\n3. Modificar cliente" + "\n4. Borrar cliente" + "\n5. Añadir nuevo coche" + "\n6. Modificar coche"
-            + "\n7. Añadir modificaciones" + "\n8. Cambiar modificaciones" + "\n9. Eliminar modificaciones"
-            + "\n0. Salir";
+    /*
+     * public static final String MENUVENDEDOR = "1. Establecer venta" +
+     * "\n2. Añadir nuevo cliente" + "\n3. Modificar cliente" +
+     * "\n4. Borrar cliente" + "\n5. Añadir nuevo coche" + "\n6. Modificar coche" +
+     * "\n7. Añadir modificaciones" + "\n8. Cambiar modificaciones" +
+     * "\n9. Eliminar modificaciones" + "\n0. Salir";
+     */
     /*
      * public static final String MENUGERENTE = "1. Añadir empleado" +
      * "\n2. Modificar empleado" + "\n3. Eliminar empleado" + "\n4. Listar ventas";
      */
     // TODO: Normalizar dni y nums negativos
+    // TODO: Añadir y editar modificaciones
     public static ArrayList<Empleado> lstEmpleados;
     public static ArrayList<Coche> lstCoches;
     public static ArrayList<Cliente> lstClientes;
@@ -66,19 +71,31 @@ public class Program {
 
     private static void menuAdministrador(Scanner sc, Connection con, Conectar conectar) {
         while (true) {
-            int option = pedirInt(sc, "Introduce una opción: \n" + MENUADMINISTRADOR + "\n", false);
+            int option = pedirInt(sc, "Introduce una opción: \n" + MENU + "\n", false);
             switch (option) {
             case 1:
                 conectar.crearTablaModificaciones(con);
+                actualizarListas(conectar, con);
                 break;
             case 2:
                 conectar.agregarPrecio(con);
+                actualizarListas(conectar, con);
                 break;
             case 3:
                 menuInsertar(conectar, con, sc);
+                actualizarListas(conectar, con);
                 break;
             case 4:
                 menuModificar(conectar, con, sc);
+                actualizarListas(conectar, con);
+                break;
+            case 5:
+                menuEliminar(conectar, con, sc);
+                actualizarListas(conectar, con);
+                break;
+            case 6:
+                vender(conectar, con, sc);
+                actualizarListas(conectar, con);
                 break;
             case 0:
                 return;
@@ -90,19 +107,112 @@ public class Program {
 
     }
 
+    private static void menuEliminar(Conectar conectar, Connection con, Scanner sc) {
+        ArrayList<String> lst = conectar.obtenerTablas(con);
+        for (String tabla : lst) {
+            if (!tabla.equals("categoria") && !tabla.equals("empleado")) {
+                System.out.println(tabla);
+            }
+        }
+        System.out.println("Introduce que deseas eliminar (omita para cancelar)");
+        sc.nextLine().toLowerCase().trim();
+        String tablaEliminar = sc.nextLine().toLowerCase().trim();
+        switch (tablaEliminar) {
+            case "coches":
+                eliminarCoche(sc, con, conectar);
+                break;
+            case "cliente":
+                eliminarCliente(sc, con, conectar);
+                break;
+            case "venta":
+                //eliminarVenta(sc, con, conectar);
+            case "modificaciones":
+                if (lst.contains("modificaciones")) {
+                    //eliminarModificaciones(sc, con, conectar);
+                } else {
+                    System.out.println("Tabla no encontrada");
+                }
+                break;
+            case "":
+                System.out.println("Operación cancelada");
+                break;
+            default:
+                System.out.println("Tabla no encontrada");
+                break;
+            }
+    }
+
+    private static void eliminarCliente(Scanner sc, Connection con, Conectar conectar) {
+        Cliente cliente = null;
+        System.out.print("Introduce la matricula del coche: ");
+        String matricula = sc.nextLine().trim().toUpperCase();
+        for (Cliente fCliente : lstClientes) {
+            if (fCliente.getDni().equals(matricula)) {
+                cliente = fCliente;
+            }
+        }
+        if (cliente != null) {
+            cliente.eliminar(con, conectar);
+        } else {
+            System.out.println("No se ha encontrado el coche");
+        }
+    }
+
+    private static void eliminarCoche(Scanner sc, Connection con, Conectar conectar) {
+        Coche coche = null;
+        System.out.print("Introduce la matricula del coche: ");
+        String matricula = sc.nextLine().trim().toUpperCase();
+        for (Coche fCoche : lstCoches) {
+            if (fCoche.getMatricula().equals(matricula)) {
+                coche = fCoche;
+            }
+        }
+        if (coche != null) {
+            coche.eliminar(con, conectar);
+        } else {
+            System.out.println("No se ha encontrado el coche");
+        }
+    }
+
+    private static void vender(Conectar conectar, Connection con, Scanner sc) {
+        System.out.print("Introduce la matrícula del coche: ");
+        sc.nextLine().toUpperCase().trim();
+        String matricula = sc.nextLine().toUpperCase().trim();
+        actualizarListas(conectar, con);
+        Coche coche = null;
+        for (Coche fcoche : lstCoches) {
+            if (fcoche.getMatricula().equals(matricula)) {
+                coche = fcoche;
+            }
+        }
+        if (coche == null) {
+            System.out.println("No se ha encontrado el coche indicado. Cancelando operación");
+            return;
+        } 
+        System.out.print("Introduce el dni del cliente: ");
+        String dni = sc.nextLine().toUpperCase().trim();
+        Cliente cliente = null;
+        for (Cliente fCliente : lstClientes) {
+            if (fCliente.getDni().equals(dni)) {
+                cliente = fCliente;
+            }
+        }
+        if (cliente == null) {
+            System.out.println("No se ha encontrado el cliente indicado. Cancelando operación");
+            return;
+        }
+        empleadoActual.vender(conectar, con, coche, cliente);
+    }
+
     private static void menuModificar(Conectar conectar, Connection con, Scanner sc) {
         ArrayList<String> lst = conectar.obtenerTablas(con);
-        boolean modificacionesExist = false;
         for (String tabla : lst) {
             if (!tabla.equals("venta") && !tabla.equals("modificaciones") && !tabla.equals("categoria")) {
                 System.out.println(tabla);
             }
-            if (tabla.equals("modificaciones")) {
-                modificacionesExist = true;
-            }
         }
-        System.out.println("Introduce la tabla que deseas modificar (omita para cancelar)");
-        sc.nextLine();
+        System.out.println("Introduce el nombre de lo que deseas modificar (omita para cancelar)");
+        sc.nextLine().toLowerCase().trim();
         String tablaModificar = sc.nextLine().toLowerCase().trim();
         switch (tablaModificar) {
         case "coches":
@@ -271,7 +381,7 @@ public class Program {
         int option = -1;
         while (option != 0) {
             option = pedirInt(sc, "Elige una opción: " + "\n1. Agregar coche" + "\n2. Agregar cliente"
-                    + "\n3. Agregar categoria" + "\n0. Volver\n", false);
+                    + "\n0. Volver\n", false);
             sc.nextLine();
             switch (option) {
             case 1:
@@ -284,18 +394,18 @@ public class Program {
                 cliente.insertar(conectar, con);
                 lstClientes.add(cliente);
                 break;
-            case 3:
-                String nombre = "";
-                while (nombre.isEmpty()) {
-                    System.out.println("Introduce el nombre de la categoría: ");
-                    nombre = sc.nextLine().trim();
-                    if (nombre.isEmpty()) {
-                        System.out.println("Debes introducir la categoria: ");
-                    }
-                }
-                int salario = pedirInt(sc, "Introduce el salario: ", false);
-                conectar.insertarCategoria(con, nombre, salario);
-                break;
+            // case 3:
+            //     String nombre = "";
+            //     while (nombre.isEmpty()) {
+            //         System.out.println("Introduce el nombre de la categoría: ");
+            //         nombre = sc.nextLine().trim();
+            //         if (nombre.isEmpty()) {
+            //             System.out.println("Debes introducir la categoria: ");
+            //         }
+            //     }
+                // int salario = pedirInt(sc, "Introduce el salario: ", false);
+                // conectar.insertarCategoria(con, nombre, salario);
+                // break;
             /*
              * case 3: Empleado empleado = insertarDatosEmpleado(sc, conectar, con);
              * empleado.insertar(conectar, con); lstEmpleados.add(empleado); break;
