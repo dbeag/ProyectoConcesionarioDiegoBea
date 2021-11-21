@@ -15,20 +15,6 @@ public class Program {
     public static final String MENUCONSULTA = "1. Consultar mis ventas" + "\n2. Consultar coches vendidos"
             + "\n3. Consultar coches disponibles" + "\n4. Consultar clientes" + "\n0. Volver" + "\n";
 
-    // Procedimiento: Establecer como inactivos los coches que se vendan
-    /*
-     * public static final String MENUVENDEDOR = "1. Establecer venta" +
-     * "\n2. Añadir nuevo cliente" + "\n3. Modificar cliente" +
-     * "\n4. Borrar cliente" + "\n5. Añadir nuevo coche" + "\n6. Modificar coche" +
-     * "\n7. Añadir modificaciones" + "\n8. Cambiar modificaciones" +
-     * "\n9. Eliminar modificaciones" + "\n0. Salir";
-     */
-    /*
-     * public static final String MENUGERENTE = "1. Añadir empleado" +
-     * "\n2. Modificar empleado" + "\n3. Eliminar empleado" + "\n4. Listar ventas";
-     */
-    // TODO: Normalizar dni y nums negativos
-    // TODO: Añadir y editar modificaciones
     public static ArrayList<Empleado> lstEmpleados;
     public static ArrayList<Coche> lstCoches;
     public static ArrayList<Cliente> lstClientes;
@@ -41,23 +27,21 @@ public class Program {
         Scanner sc = new Scanner(System.in);
         Conectar conectar = new Conectar();
         Connection con = conectar.conectar();
-        return;
-        //Connection con = establecerConexion(conectar);
-        // actualizarListas(conectar, con);
-        // if (con == null) {
-        //     cerrarConexion(con);
-        //     sc.close();
-        //     return;
-        // }
-        // empleadoActual = menuInicioSesion(sc, con);
-        // if (empleadoActual == null) {
-        //     cerrarConexion(con);
-        //     sc.close();
-        //     return;
-        // }
-        // mostrarMenu(sc, con, conectar);
-        // cerrarConexion(con);
-        // sc.close();
+        actualizarListas(conectar, con);
+        if (con == null) {
+            cerrarConexion(con);
+            sc.close();
+            return;
+        }
+        empleadoActual = menuInicioSesion(sc, con);
+        if (empleadoActual == null) {
+            cerrarConexion(con);
+            sc.close();
+            return;
+        }
+        mostrarMenu(sc, con, conectar);
+        cerrarConexion(con);
+        sc.close();
     }
 
     private static void actualizarListas(Conectar conectar, Connection con) {

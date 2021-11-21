@@ -73,7 +73,6 @@ public class Conectar {
             NodeList nList = doc.getElementsByTagName("conexion");
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
-                System.out.println("\nCurrent Element :" + nNode.getNodeName());
                 Element element = (Element) nNode;
                 pwd = element.getElementsByTagName("pwd").item(0).getTextContent();
             }
@@ -95,7 +94,6 @@ public class Conectar {
             NodeList nList = doc.getElementsByTagName("conexion");
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
-                System.out.println("\nCurrent Element :" + nNode.getNodeName());
                 Element element = (Element) nNode;
                 user = element.getElementsByTagName("user").item(0).getTextContent();
             }
@@ -118,7 +116,6 @@ public class Conectar {
             NodeList nList = doc.getElementsByTagName("conexion");
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
-                System.out.println("\nCurrent Element :" + nNode.getNodeName());
                 Element element = (Element) nNode;
                 url += element.getElementsByTagName("host").item(0).getTextContent() + ":";
                 url += element.getElementsByTagName("port").item(0).getTextContent() + "/";
