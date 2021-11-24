@@ -53,7 +53,7 @@ public class Cliente {
             values += "\"" + this.getApellidos() + "\", ";
         }
         if (telefono != -1) {
-            campos += "precio, ";
+            campos += "telefono, ";
             values += this.getTelefono() + ", ";
         }
         String sql = "insert into cliente (dni, " + campos + "activo) values (\"" + this.getDni() + "\", " + values + this.isActivo() + ")";
