@@ -180,7 +180,7 @@ public class Program {
 
     private static void eliminarEmpleado(Scanner sc, Connection con, Conectar conectar) {
         Empleado empleado = null;
-        System.out.print("Introduce el dni del cliente: ");
+        System.out.print("Introduce el dni del empleado: ");
         String matricula = sc.nextLine().trim().toUpperCase();
         for (Empleado fEmpleado : lstEmpleados) {
             if (fEmpleado.getDni().equals(matricula)) {
