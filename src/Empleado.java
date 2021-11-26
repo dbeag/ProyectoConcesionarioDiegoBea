@@ -150,7 +150,7 @@ public class Empleado {
         if (!conectar.comprobarVenta(this, con)) {
             sql = "delete from empleado where dni like \"" + this.getDni() + "\"";
         } else {
-            sql = "update from empleado set activo = false where dni like \"" + this.getDni() + "\"";
+            sql = "update empleado set activo = false where dni like \"" + this.getDni() + "\"";
         }
         conectar.ejecutarSql(con, sql);
     }

@@ -85,7 +85,7 @@ public class Cliente {
         if (!conectar.comprobarVenta(this, con)) {
             sql = "delete from cliente where dni like \"" + this.getDni() + "\"";
         } else {
-            sql = "update from cliente set activo = false where dni like \"" + this.getDni() + "\"";
+            sql = "update cliente set activo = false where dni like \"" + this.getDni() + "\"";
         }
         conectar.ejecutarSql(con, sql);
     }
