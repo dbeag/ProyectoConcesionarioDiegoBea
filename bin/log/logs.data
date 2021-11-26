@@ -1,0 +1,33 @@
+<<<<<<< HEAD
+=======
+For input string: "s"
+Table 'modificaciones' already exists
+Duplicate column name 'precio'
+For input string: "s"
+For input string: "s"
+Table 'modificaciones' already exists
+Duplicate column name 'precio'
+Unknown column 'precio' in 'field list'
+For input string: "s"
+For input string: "s"
+For input string: "s"
+Table 'modificaciones' already exists
+Duplicate column name 'precio'
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+Duplicate entry '9999ZZZ' for key 'PRIMARY'
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+For input string: "s"
+You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'from cliente set activo = false where dni like "1111111A"' at line 1
+>>>>>>> c22b87a9f174270c61fc4d77b2770556889e80b6

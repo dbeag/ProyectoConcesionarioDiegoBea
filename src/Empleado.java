@@ -104,7 +104,7 @@ public class Empleado {
             values += "\"" + this.getApellidos() + "\", ";
         }
         if (telefono != -1) {
-            campos += "precio, ";
+            campos += "telefono, ";
             values += this.getTelefono() + ", ";
         }
         String sql = "insert into empleado (dni, " + campos + "activo) values (\"" + this.getDni() + "\", " + values
