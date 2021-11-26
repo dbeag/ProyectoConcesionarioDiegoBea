@@ -329,7 +329,7 @@ public class Program {
             System.out.println("Operación cancelada");
             break;
         default:
-            System.out.println("Tabla no encontrada");
+            System.out.println("Acción no encontrada");
             break;
         }
     }
@@ -388,7 +388,7 @@ public class Program {
     }
 
     private static void modificarCoches(Scanner sc, Connection con, Conectar conectar) {
-        System.out.println("Modificando tabla coches");
+        System.out.println("Modificando coches");
         System.out.println("Introduce la matrícula del coche");
         boolean modificado = false;
         String matricula = sc.nextLine().trim();
@@ -437,7 +437,7 @@ public class Program {
     }
 
     private static void modificarCliente(Scanner sc, Connection con, Conectar conectar) {
-        System.out.println("Modificando tabla cliente");
+        System.out.println("Modificando clientes");
         System.out.print("Introduce el dni del cliente: ");
         boolean modificado = false;
         String dni = sc.nextLine().trim();
